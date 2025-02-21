@@ -4,7 +4,7 @@ description: This rock is a drop in replacement for the cilium/cilium image.
 version: "1.16.3"
 license: Apache-2.0
 
-base: ubuntu@24.04
+base: bare
 build-base: ubuntu@24.04
 platforms:
   amd64:
@@ -25,11 +25,13 @@ parts:
     plugin: nil
     build-packages:
       - wget
-    overlay-script: |
+    override-build: |
       wget https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-$CRAFT_ARCH_BUILD_FOR
-      mv bazelisk-linux-$CRAFT_ARCH_BUILD_FOR /usr/bin/bazelisk
-      chmod +x /usr/bin/bazelisk
-      ln -sf /usr/bin/bazelisk /usr/bin/bazel
+      mkdir -p $CRAFT_PART_INSTALL/usr/bin
+      mv bazelisk-linux-$CRAFT_ARCH_BUILD_FOR $CRAFT_PART_INSTALL/usr/bin/bazelisk
+      chmod +x $CRAFT_PART_INSTALL/usr/bin/bazelisk
+      ln -sf /usr/bin/bazelisk $CRAFT_PART_INSTALL/usr/bin/bazel
+      ln -sf $CRAFT_PART_INSTALL/usr/bin/bazelisk $CRAFT_PART_INSTALL/usr/bin/bazel
 
   cilium-envoy:
     after: [bazelisk]
